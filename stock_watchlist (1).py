@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
+from io import BytesIO
 
 # --- STREAMLIT APP ---
 st.set_page_config(page_title="Stock Watchlist Generator", layout="wide")
@@ -54,10 +55,14 @@ if st.button("Generate Watchlist"):
         col2.metric("🏦 Avg Market Cap", f"${avg_mcap:,.0f}" if pd.notna(avg_mcap) else "N/A")
         col3.metric("📊 Avg P/E Ratio", f"{avg_pe:.2f}" if pd.notna(avg_pe) else "N/A")
 
-        # Download button
+        # --- Download button (fixed) ---
+        output = BytesIO()
+        df.to_excel(output, index=False, engine="openpyxl")
+        output.seek(0)
+
         st.download_button(
             label="Download as Excel",
-            data=df.to_excel(index=False, engine="openpyxl"),
+            data=output,
             file_name="stock_watchlist.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
